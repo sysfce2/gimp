@@ -146,7 +146,7 @@ vector_layer_options_dialog_new (GimpVectorLayer *layer,
     gtk_box_pack_start (GTK_BOX (main_vbox), frame, FALSE, FALSE, 0);
     gtk_widget_show (frame);
 
-    fill_editor = gimp_fill_editor_new (fill_options, TRUE);
+    fill_editor = gimp_fill_editor_new (fill_options, TRUE, TRUE);
     gtk_container_add (GTK_CONTAINER (frame), fill_editor);
     gtk_widget_show (fill_editor);
   }
@@ -165,7 +165,7 @@ vector_layer_options_dialog_new (GimpVectorLayer *layer,
     gimp_image_get_resolution (gimp_item_get_image (GIMP_ITEM (layer)),
                                &xres, &yres);
 
-    stroke_editor = gimp_stroke_editor_new (stroke_options, yres, TRUE);
+    stroke_editor = gimp_stroke_editor_new (stroke_options, yres, TRUE, TRUE);
     gtk_container_add (GTK_CONTAINER (frame), stroke_editor);
     gtk_widget_show (stroke_editor);
   }
@@ -219,19 +219,19 @@ vector_layer_options_dialog_response (GtkWidget *widget,
 
       if (layer && layer->options )
 	    {
-          gimp_config_sync (G_OBJECT (saved_options->fill_options), 
-                           G_OBJECT (layer->options->fill_options), 0); 
-          gimp_config_sync (G_OBJECT (saved_options->stroke_options), 
-                            G_OBJECT (layer->options->stroke_options), 0); 
-     
+          gimp_config_sync (G_OBJECT (saved_options->fill_options),
+                           G_OBJECT (layer->options->fill_options), 0);
+          gimp_config_sync (G_OBJECT (saved_options->stroke_options),
+                            G_OBJECT (layer->options->stroke_options), 0);
+
           gimp_image_undo_push_vector_layer (gimp_item_get_image (GIMP_ITEM (layer)),
-                                             _("Fill/Stroke Vector Layer"), 
+                                             _("Fill/Stroke Vector Layer"),
                                              layer, NULL);
 
-          gimp_config_sync (G_OBJECT (fill_options), 
-                            G_OBJECT (layer->options->fill_options), 0); 
-          gimp_config_sync (G_OBJECT (stroke_options), 
-                            G_OBJECT (layer->options->stroke_options), 0); 
+          gimp_config_sync (G_OBJECT (fill_options),
+                            G_OBJECT (layer->options->fill_options), 0);
+          gimp_config_sync (G_OBJECT (stroke_options),
+                            G_OBJECT (layer->options->stroke_options), 0);
 	    }
 
       gtk_widget_destroy (dialog);

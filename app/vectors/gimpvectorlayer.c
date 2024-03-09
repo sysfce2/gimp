@@ -446,15 +446,12 @@ gimp_vector_layer_render (GimpVectorLayer *layer)
   GimpDrawable *drawable = GIMP_DRAWABLE (layer);
   GimpItem     *item     = GIMP_ITEM (layer);
   GimpImage    *image    = gimp_item_get_image (item);
-  GimpRGB       blank;
 
   g_return_val_if_fail (gimp_item_is_attached (GIMP_ITEM (drawable)), FALSE);
 
   g_object_freeze_notify (G_OBJECT (drawable));
 
   /* make the layer background transparent */
-  gimp_rgba_set (&blank, 1.0, 1.0, 1.0, 0.0);
-
   gimp_drawable_fill (GIMP_DRAWABLE (layer),
                       gimp_get_user_context (image->gimp),
                       GIMP_FILL_TRANSPARENT);

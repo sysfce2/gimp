@@ -55,19 +55,19 @@ enum
 
 /* local function declarations */
 
-static GObject *gimp_vector_layer_options_constructor  (GType       type,
-                                                        guint       n_params,
-                                                        GObjectConstructParam *params);
-static void     gimp_vector_layer_options_finalize     (GObject         *object);
+static GObject *gimp_vector_layer_options_constructor  (GType                   type,
+                                                        guint                   n_params,
+                                                        GObjectConstructParam  *params);
+static void     gimp_vector_layer_options_finalize     (GObject                *object);
 
-static void     gimp_vector_layer_options_get_property (GObject         *object,
-                                                        guint            property_id,
-                                                        GValue          *value,
-                                                        GParamSpec      *pspec);
-static void     gimp_vector_layer_options_set_property (GObject         *object,
-                                                        guint            property_id,
-                                                        const GValue    *value,
-                                                        GParamSpec      *pspec);
+static void     gimp_vector_layer_options_get_property (GObject                *object,
+                                                        guint                   property_id,
+                                                        GValue                 *value,
+                                                        GParamSpec             *pspec);
+static void     gimp_vector_layer_options_set_property (GObject                *object,
+                                                        guint                   property_id,
+                                                        const GValue           *value,
+                                                        GParamSpec             *pspec);
 static void     gimp_vector_layer_options_vectors_changed
                                                        (GimpVectorLayerOptions *options);
 
@@ -302,8 +302,8 @@ gimp_vector_layer_options_new (GimpImage     *image,
 {
   GimpVectorLayerOptions *options;
   GimpPattern            *pattern;
-  GimpRGB                 stroke_color;
-  GimpRGB                 fill_color;
+  GeglColor              *stroke_color;
+  GeglColor              *fill_color;
 
   g_return_val_if_fail (GIMP_IS_IMAGE (image), NULL);
   g_return_val_if_fail (GIMP_IS_VECTORS (vectors), NULL);
@@ -313,16 +313,16 @@ gimp_vector_layer_options_new (GimpImage     *image,
                           "gimp", image->gimp,
                           NULL);
 
-  gimp_context_get_foreground (context, &stroke_color);
-  gimp_context_get_background (context, &fill_color);
-  pattern = gimp_context_get_pattern (context);
+  stroke_color = gimp_context_get_foreground (context);
+  fill_color   = gimp_context_get_background (context);
+  pattern      = gimp_context_get_pattern (context);
 
   gimp_context_set_foreground (GIMP_CONTEXT (options->fill_options),
-                               &fill_color);
+                               fill_color);
   gimp_context_set_pattern (GIMP_CONTEXT (options->fill_options), pattern);
 
   gimp_context_set_foreground (GIMP_CONTEXT (options->stroke_options),
-                               &stroke_color);
+                               stroke_color);
   gimp_context_set_pattern (GIMP_CONTEXT (options->stroke_options), pattern);
 
   g_object_set (options->stroke_options,

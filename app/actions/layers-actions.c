@@ -63,7 +63,7 @@ static const GimpActionEntry layers_actions[] =
     GIMP_HELP_LAYER_EDIT },
 
   { "layers-edit-vector", GIMP_ICON_TOOL_PATH,
-    N_("Path Tool"), NULL,
+    N_("Path Tool"), NULL, { NULL },
     N_("Activate the path tool on this vector layer's path"),
     layers_edit_vector_cmd_callback,
     GIMP_HELP_TOOL_PATH },
@@ -200,13 +200,13 @@ static const GimpActionEntry layers_actions[] =
     GIMP_HELP_LAYER_TEXT_ALONG_PATH },
 
   { "layers-vector-fill-stroke", NULL,
-    N_("Fill / Stroke"), NULL,
+    N_("Fill / Stroke"), NULL, { NULL },
     N_("Edit the fill and stroke of this vector layer"),
     layers_vector_fill_stroke_cmd_callback,
     NULL },
 
   { "layers-vector-discard", NULL,
-    N_("Discard Vector Information"), NULL,
+    N_("Discard Vector Information"), NULL, { NULL },
     N_("Turn this vector layer into a normal layer"),
    layers_vector_discard_cmd_callback,
     NULL },
