@@ -264,6 +264,7 @@ Name: gs; Description: "{cm:ComponentsGhostscript}"; Types: full custom
 
 ;Locales
 Name: loc; Description: "{cm:ComponentsTranslations}"; Types: full custom
+#include "base_po-cmp.list"
 
 #ifdef LUA
 Name: lua; Description: "{cm:ComponentsLua}"; Types: full custom
@@ -316,7 +317,7 @@ Source: "{#DEPS_DIR32}\share\*"; DestDir: "{app}\share"; Excludes: "{#OMISSIONS}
 ;Optional neutral components (complete install)
 Source: "{#DEPS_DIR32}\share\ghostscript\*"; DestDir: "{app}\share\ghostscript"; Components: gs and ({#GIMP_ARCHS}); Flags: recursesubdirs restartreplace uninsrestartdelete ignoreversion
 Source: "{#GIMP_DIR32}\share\locale\*"; DestDir: "{app}\share\locale"; Components: loc; Flags: recursesubdirs restartreplace uninsrestartdelete ignoreversion
-Source: "{#DEPS_DIR32}\share\locale\*"; DestDir: "{app}\share\locale"; Components: loc; Flags: recursesubdirs restartreplace uninsrestartdelete ignoreversion
+#include "base_po-dir.list"
 #ifdef LUA
 Source: "{#DEPS_DIR32}\share\lua\*"; DestDir: "{app}\share\lua"; Components: lua and ({#GIMP_ARCHS}); Flags: recursesubdirs restartreplace ignoreversion uninsrestartdelete
 #endif

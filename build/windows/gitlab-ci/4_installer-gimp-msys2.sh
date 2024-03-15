@@ -83,6 +83,39 @@ cp _build-x64/build/windows/installer/lang/*isl build/windows/installer/lang
 cp _build-x64/build/windows/installer/*bmp build/windows/installer/
 
 
+# Get list of GIMP supported languages
+PO_LIST=`ls po/*.po | \
+         sed 's%.*/po/\([a-zA-Z_]*\).po%\1%' | sort`
+PO_LIST=`echo "$PO_LIST" | tr '\n\r' ' '` && PO_ARRAY=($PO_LIST)
+
+# Create list of language components
+for PO in "${PO_ARRAY[@]}"; do
+  NL=$'\n'
+  CMP_LINE='Name: loc\PO; Description: "DESC"; Types: full custom'
+  CMP_LINE=$(sed "s/PO/$PO/g" <<< $CMP_LINE)
+
+  DESC=`grep -rI '^"Language-Team: .* <' po/$PO.po | \
+        sed -e 's/.*Language-Team: \(.*\) <.*/\1/' | sort`
+  if [[ -z "$DESC" ]]; then
+    DESC="$PO"
+  fi
+  CMP_LINE=$(sed "s/DESC/$DESC/g" <<< $CMP_LINE)
+
+  CMP_LIST+="${CMP_LINE}${NL}"
+done
+echo "$CMP_LIST" > build/windows/installer/base_po-cmp.list
+
+# Create list of language folders
+for PO in "${PO_ARRAY[@]}"; do
+  NL=$'\n'
+  DIR_LINE='Source: "{#GIMP_DIR32}\share\locale\PO"; DestDir: "{app}\share\locale"; Components: loc\PO; Flags: recursesubdirs restartreplace uninsrestartdelete ignoreversion'
+  DIR_LINE=$(sed "s/PO/$PO/g" <<< $DIR_LINE)
+
+  DIR_LIST+="${DIR_LINE}${NL}"
+done
+echo "$DIR_LIST" > build/windows/installer/base_po-dir.list
+
+
 # Construct now the installer.
 GIMP_VERSION=`grep -rI '\<version *:' meson.build | head -1 | sed "s/^.*version *: *'\([0-9]\+\.[0-9]\+\.[0-9]\+\)' *,.*$/\1/"`
 #GIMP_APP_VERSION_MAJOR=`echo $VERSION | sed "s/^\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)$/\1/"`
