@@ -43,6 +43,7 @@ plugin_name = 'metadata-viewer'
 
 plugin_sources = [
   'metadata-viewer.c',
+  'metadata-tag-object.c',
   'metadata-tags.c',
 ]
 
