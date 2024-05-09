@@ -209,6 +209,7 @@ metadata_viewer_dialog (GimpImage     *image,
   GtkWidget         *scrolled_win;
   GtkWidget         *list_box;
   GtkWidget         *label;
+  GtkSizeGroup      *tag_size_group;
   GListStore        *exif_store, *xmp_store, *iptc_store;
   GExiv2Metadata    *metadata;
 
@@ -255,8 +256,9 @@ metadata_viewer_dialog (GimpImage     *image,
   list_box = gtk_list_box_new ();
   gtk_list_box_set_selection_mode (GTK_LIST_BOX (list_box),
                                    GTK_SELECTION_NONE);
+  tag_size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
   gtk_list_box_bind_model (GTK_LIST_BOX (list_box), G_LIST_MODEL (exif_store),
-                           create_widget_for_tag_object, NULL, NULL);
+                           create_widget_for_tag_object, tag_size_group, g_object_unref);
   gtk_widget_set_vexpand (list_box, TRUE);
 
   label = gtk_label_new (_("Exif"));
@@ -277,8 +279,9 @@ metadata_viewer_dialog (GimpImage     *image,
   list_box = gtk_list_box_new ();
   gtk_list_box_set_selection_mode (GTK_LIST_BOX (list_box),
                                    GTK_SELECTION_NONE);
+  tag_size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
   gtk_list_box_bind_model (GTK_LIST_BOX (list_box), G_LIST_MODEL (xmp_store),
-                           create_widget_for_tag_object, NULL, NULL);
+                           create_widget_for_tag_object, tag_size_group, g_object_unref);
   gtk_widget_set_vexpand (list_box, TRUE);
 
   label = gtk_label_new (_("XMP"));
@@ -299,8 +302,9 @@ metadata_viewer_dialog (GimpImage     *image,
   list_box = gtk_list_box_new ();
   gtk_list_box_set_selection_mode (GTK_LIST_BOX (list_box),
                                    GTK_SELECTION_NONE);
+  tag_size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
   gtk_list_box_bind_model (GTK_LIST_BOX (list_box), G_LIST_MODEL (iptc_store),
-                           create_widget_for_tag_object, NULL, NULL);
+                           create_widget_for_tag_object, tag_size_group, g_object_unref);
   gtk_widget_set_vexpand (list_box, TRUE);
 
   label = gtk_label_new (_("IPTC"));
@@ -363,6 +367,7 @@ create_widget_for_tag_object (gpointer item,
                               gpointer user_data)
 {
   GimpMetadataTagObject *tag_obj = GIMP_METADATA_TAG_OBJECT (item);
+  GtkSizeGroup          *tag_size_group = GTK_SIZE_GROUP (user_data);
   GtkWidget             *row;
   GtkWidget             *box;
   GtkWidget             *tag_label;
@@ -376,13 +381,15 @@ create_widget_for_tag_object (gpointer item,
   gtk_widget_show (box);
 
   tag_label = gtk_label_new (gimp_metadata_tag_object_get_tag (tag_obj));
+  gtk_label_set_xalign (GTK_LABEL (tag_label), 0.0);
+  gtk_size_group_add_widget (tag_size_group, tag_label);
   gtk_widget_show (tag_label);
   gtk_box_pack_start (GTK_BOX (box), tag_label, FALSE, FALSE, 6);
 
   value_label = gtk_label_new (gimp_metadata_tag_object_get_value (tag_obj));
   gtk_label_set_selectable (GTK_LABEL (value_label), TRUE);
   gtk_widget_show (value_label);
-  gtk_box_pack_end (GTK_BOX (box), value_label, FALSE, FALSE, 6);
+  gtk_box_pack_start (GTK_BOX (box), value_label, FALSE, FALSE, 6);
 
   return row;
 }
