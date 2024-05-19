@@ -687,7 +687,7 @@ cppcheck:
 
 ## Ready-to-distribute ##
 
-sources-debian:
+dist-sources:
   extends: .default
   rules:
     - <<: *CI_COMMIT
@@ -708,7 +708,7 @@ sources-debian:
       - gimp-*.tar.xz.SHA512SUMS
     expire_in: 2 days
 
-dev-docs:
+dist-dev-docs:
   extends: .default
   rules:
     - <<: *CI_COMMIT
@@ -814,3 +814,58 @@ dist-store-weekly:
     - build/windows/store/_Output/
     - store.log
     expire_in: 8 days
+
+release:
+  extends: .default
+  rules:
+    - <<: *CI_RELEASE
+  needs:
+    - job: dist-sources
+      artifacts: true
+    - job: dist-dev-docs
+      artifacts: false
+    # job: dist-installer-weekly
+    # artifacts: false
+    # job: dist-store-weekly
+    # artifacts: false
+  stage: .post
+  #image: registry.gitlab.com/gitlab-org/release-cli:latest
+  cache: []
+  script:
+    - apt-get install -y --no-install-recommends wget
+    - wget https://gitlab.com/api/v4/projects/gitlab-org%2Frelease-cli/packages/generic/release-cli/latest/release-cli-linux-amd64 -O release-cli
+    - chmod +x ./release-cli
+    - export PATH=$PWD:$PATH
+    # Get GIMP version
+    - export GIMP_VERSION=$(find . -iname '*.tar.xz' | sed 's|./gimp-||' | sed 's|.tar.xz||')
+    - export GIMP_APP_VERSION=$(echo $GIMP_VERSION | sed 's/\([0-9]\+\.[0-9]\+\)\..*/\1/')
+    - GIMP_APP_VERSION_MAJOR=$(echo $GIMP_APP_VERSION | sed 's/^[^0-9]*\([0-9]*\).*$/\1/')
+    - GIMP_APP_VERSION_MINOR=$(echo $GIMP_APP_VERSION | sed "s|${GIMP_APP_VERSION_MAJOR}.||")
+    - echo $(($GIMP_APP_VERSION_MINOR % 2)) | grep '1' && export UNSTABLE='beta-'
+    # Get changelog
+    - RELEASE_NOTES=$(cat NEWS | sed -n '/Overview of Changes/{p; :loop n; p; /Overview of Changes/q; b loop}')
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: 'GIMP $GIMP_VERSION (fake release for testing purposes)'
+    description: '$RELEASE_NOTES'
+    milestones: $GIMP_VERSION
+    assets:
+      links:
+        - name: '(fake) Source tarball'
+          url: 'https://download.gimp.org/gimp/v${GIMP_APP_VERSION}/gimp-${GIMP_VERSION}.tar.bz2'
+          link_type: other
+        - name: '(fake) Universal Linux Flatpak (x86_64, Aarch64)'
+          url: 'https://flathub.org/${UNSTABLE}repo/appstream/org.gimp.GIMP.flatpakref'
+          link_type: package
+        - name: '(fake) macOS DMG for Apple Silicon'
+          url: 'https://download.gimp.org/pub/gimp/v${GIMP_APP_VERSION}/macos/gimp-${GIMP_VERSION}-arm64.dmg'
+          link_type: package
+        - name: '(fake) macOS DMG for Intel'
+          url: 'https://download.gimp.org/pub/gimp/v${GIMP_APP_VERSION}/macos/gimp-${GIMP_VERSION}-x86_64.dmg'
+          link_type: package
+        - name: '(fake) Microsoft Store (Aarch64, x86_64)'
+          url: 'TBA'
+          link_type: package
+        - name: '(fake) Universal Windows installer (Aarch64, x86_64, x86)'
+          url: 'https://download.gimp.org/gimp/v${GIMP_APP_VERSION}/windows/gimp-${GIMP_VERSION}-setup.exe'
+          link_type: package
